@@ -1,51 +1,56 @@
 # Data-Driven Investment Model
 
-> ML-based market return prediction using Random Forest, KNN, and Linear Regression in Python
+> ML-based market return prediction comparing Random Forest, KNN, and Linear Regression in Python.
 
 ## Overview
 
-This project builds and compares three ML models with feature engineering across multi-variable financial datasets to optimize forecast accuracy. Random Forest outperformed baseline assumptions after cross-validation with **8.7% lower RMSE**, identifying key performance drivers across asset classes.
-
-**Key Result:** Random Forest achieved the lowest prediction error after 5-fold cross-validation — **8.7% lower RMSE** vs. baseline.
+This project trains and compares three machine learning models to forecast market returns from a tabular financial dataset. It is intended as an educational reference implementation: the pipeline covers data loading, feature engineering, model training, cross-validation, and side-by-side evaluation. Real performance numbers depend on the dataset you provide; this repository ships with a small synthetic sample so the pipeline can be run end-to-end without external data.
 
 ## Tools & Technologies
 
 | Tool | Purpose |
 |------|---------|
-| Python | Core modeling language |
+| Python 3.9+ | Core modeling language |
 | Scikit-learn | ML model training and evaluation |
 | Pandas / NumPy | Data wrangling and feature engineering |
 | Matplotlib / Seaborn | Visualization |
-| Random Forest | Best-performing model |
-| KNN / Linear Regression | Comparison models |
+| Jupyter | Exploratory notebooks |
+
+Models compared: Linear Regression (baseline), K-Nearest Neighbors, and Random Forest Regressor.
 
 ## Repository Structure
 
 ```
 data-driven-investment-model/
 ├── README.md
+├── requirements.txt
+├── .env.example
+├── .gitignore
+├── config/
+│   └── config.yaml
+├── data/
+│   ├── README.md
+│   └── sample_data.csv          # Small synthetic example dataset
+├── docs/
+│   └── data_schema.md           # Expected columns and types
 ├── notebooks/
 │   ├── 01_data_exploration.ipynb
 │   ├── 02_feature_engineering.ipynb
 │   ├── 03_model_training.ipynb
 │   └── 04_model_comparison.ipynb
-├── src/
-│   ├── models.py
-│   ├── features.py
-│   └── evaluate.py
-├── data/
-│   └── sample_data.csv          # Sample dataset (replace with full data)
-├── config/
-│   └── config.yaml
-├── requirements.txt
-└── .env.example
+└── src/
+    ├── __init__.py
+    ├── data.py                  # Data loading helpers
+    ├── features.py              # Feature engineering
+    ├── models.py                # Model factory + training entrypoint
+    └── evaluate.py              # Cross-validation and metrics
 ```
 
 ## Environment Setup
 
 ### Prerequisites
 - Python 3.9+
-- pip or conda
+- pip
 
 ### Setup Instructions
 
@@ -58,7 +63,7 @@ data-driven-investment-model/
 2. **Create a virtual environment**
    ```bash
    python -m venv venv
-   source venv/bin/activate        # Mac/Linux
+   source venv/bin/activate        # macOS / Linux
    venv\Scripts\activate           # Windows
    ```
 
@@ -67,67 +72,37 @@ data-driven-investment-model/
    pip install -r requirements.txt
    ```
 
-4. **Add your data**
-   - Place your financial dataset CSV in the `data/` folder
-   - Update the `data_path` in `config/config.yaml`
+4. **Provide data**
+   - The repo ships with `data/sample_data.csv`, a small synthetic dataset that lets the pipeline run out of the box.
+   - To use your own data, drop a CSV in `data/` matching the schema in `docs/data_schema.md` and update `data.data_path` in `config/config.yaml`.
 
 ## Configuration
 
-### `config/config.yaml`
-```yaml
-data:
-  data_path: "data/financial_data.csv"
-  target_column: "returns"
-  test_size: 0.2
-  random_state: 42
+See `config/config.yaml`. Key fields:
 
-models:
-  random_forest:
-    n_estimators: 200
-    max_depth: 10
-    min_samples_split: 5
-  knn:
-    n_neighbors: 7
-  linear_regression:
-    fit_intercept: true
+- `data.data_path` — path to the input CSV
+- `data.target_column` — column to predict (default `returns`)
+- `data.test_size` / `data.random_state` — train/test split
+- `models.*` — hyperparameters per model
+- `evaluation.cv_folds` / `evaluation.scoring` — cross-validation settings
 
-evaluation:
-  cv_folds: 5
-  scoring: "neg_root_mean_squared_error"
-```
-
-## Running the Models
+## Running the Pipeline
 
 ```bash
-# Run full model pipeline
-python src/models.py --config config/config.yaml
+# Train all three models and print cross-validated metrics
+python -m src.models --config config/config.yaml
 
-# Run individual notebooks
-jupyter notebook notebooks/03_model_training.ipynb
+# Or work through the notebooks
+jupyter notebook notebooks/
 ```
 
-## Requirements
+The training script loads the configured CSV, applies the feature engineering steps in `src/features.py`, fits each model, runs k-fold cross-validation, and prints a comparison table of RMSE and R².
 
-```
-pandas==2.1.0
-numpy==1.26.0
-scikit-learn==1.3.0
-matplotlib==3.8.0
-seaborn==0.13.0
-jupyter==1.0.0
-pyyaml==6.0
-python-dotenv==1.0.0
-```
+## Results
 
-## Model Results Summary
-
-| Model | RMSE | R² | Notes |
-|-------|------|-----|-------|
-| Random Forest | Lowest | Best | After cross-validation |
-| KNN | Mid | Mid | Sensitive to feature scaling |
-| Linear Regression | Highest | Baseline | Baseline comparison |
+This repository does not publish benchmark numbers, because results are entirely a function of the dataset you supply. Run the pipeline on your own data to obtain RMSE / R² for each model. The output of `src/models.py` is the canonical comparison.
 
 ## Author
 
-**Joash** | MS Business Analytics  
+**Joash** | MS Business Analytics
 [GitHub](https://github.com/JNKAnalyst) | [Portfolio](https://jnkanalyst.github.io/portfolio/)
