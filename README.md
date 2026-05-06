@@ -104,5 +104,5 @@ This repository does not publish benchmark numbers, because results are entirely
 
 ## Author
 
-**Joash** | MS Business Analytics
+**Joash**
 [GitHub](https://github.com/JNKAnalyst) | [Portfolio](https://jnkanalyst.github.io/portfolio/)
